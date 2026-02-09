@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { getForms } from '../storage/formsStorage';
 
 export function AccountScreen() {
   const [offlineCount, setOfflineCount] = useState(0);
 
   const user = {
-    name: 'Usuário',
+    name: 'Usuario',
     email: 'usuario@exemplo.com',
     role: 'Operador',
   };
@@ -22,10 +22,10 @@ export function AccountScreen() {
 
   function handleShowOfflineAlert() {
     Alert.alert(
-      'Formulários offline',
+      'Formularios offline',
       offlineCount === 0
-        ? 'Nenhum formulário pendente.'
-        : `Você tem ${offlineCount} formulário(s) salvo(s) offline aguardando upload.`
+        ? 'Nenhum formulario completo pendente.'
+        : `Voce tem ${offlineCount} formulario(s) completo(s) salvo(s) offline aguardando envio.`,
     );
   }
 
@@ -40,7 +40,7 @@ export function AccountScreen() {
         <Text style={styles.label}>E-mail</Text>
         <Text style={styles.value}>{user.email}</Text>
 
-        <Text style={styles.label}>Função</Text>
+        <Text style={styles.label}>Funcao</Text>
         <Text style={styles.value}>{user.role}</Text>
       </View>
 
@@ -75,7 +75,13 @@ const styles = StyleSheet.create({
   value: { color: '#F9FAFB', fontSize: 16, fontWeight: '500' },
   statusLabel: { color: '#9CA3AF', fontSize: 13, marginBottom: 4 },
   statusValue: { color: '#F9FAFB', fontSize: 18, fontWeight: '600', marginBottom: 16 },
-  button: { backgroundColor: '#22C55E', paddingVertical: 12, borderRadius: 999, alignItems: 'center', marginBottom: 10 },
+  button: {
+    backgroundColor: '#22C55E',
+    paddingVertical: 12,
+    borderRadius: 999,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
   buttonText: { color: '#020617', fontWeight: 'bold' },
   secondaryButton: { backgroundColor: '#1F2937' },
   secondaryButtonText: { color: '#E5E7EB', fontWeight: '500' },
