@@ -1,15 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { getForms } from '../storage/formsStorage';
+import { useAuth } from '../context/AuthContext';
 
 export function AccountScreen() {
   const [offlineCount, setOfflineCount] = useState(0);
-
-  const user = {
-    name: 'Usuario',
-    email: 'usuario@exemplo.com',
-    role: 'Operador',
-  };
+  const { session, signOut } = useAuth();
 
   const loadOfflineCount = useCallback(async () => {
     const forms = await getForms();
@@ -29,19 +25,28 @@ export function AccountScreen() {
     );
   }
 
+  async function handleSignOut() {
+    await signOut();
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Minha conta</Text>
 
       <View style={styles.card}>
         <Text style={styles.label}>Nome</Text>
-        <Text style={styles.value}>{user.name}</Text>
+        <Text style={styles.value}>{session?.user.name ?? '-'}</Text>
 
         <Text style={styles.label}>E-mail</Text>
-        <Text style={styles.value}>{user.email}</Text>
+        <Text style={styles.value}>{session?.user.email ?? '-'}</Text>
 
         <Text style={styles.label}>Funcao</Text>
-        <Text style={styles.value}>{user.role}</Text>
+        <Text style={styles.value}>{session?.user.role ?? '-'}</Text>
+
+        <Text style={styles.label}>Token</Text>
+        <Text style={styles.tokenPreview}>
+          {session?.token ? `${session.token.slice(0, 24)}...` : '-'}
+        </Text>
       </View>
 
       <View style={styles.card}>
@@ -54,6 +59,10 @@ export function AccountScreen() {
 
         <TouchableOpacity style={[styles.button, styles.secondaryButton]} onPress={loadOfflineCount}>
           <Text style={styles.secondaryButtonText}>Atualizar contagem</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={[styles.button, styles.logoutButton]} onPress={handleSignOut}>
+          <Text style={styles.logoutText}>Sair</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -85,4 +94,7 @@ const styles = StyleSheet.create({
   buttonText: { color: '#020617', fontWeight: 'bold' },
   secondaryButton: { backgroundColor: '#1F2937' },
   secondaryButtonText: { color: '#E5E7EB', fontWeight: '500' },
+  tokenPreview: { color: '#A7F3D0', fontSize: 12, fontFamily: 'monospace', marginTop: 2 },
+  logoutButton: { backgroundColor: '#7F1D1D', marginTop: 8 },
+  logoutText: { color: '#FECACA', fontWeight: '700' },
 });

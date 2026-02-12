@@ -1,9 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import type { EstadoCivil, FormData, FormPayload, LocationSnapshot, LocationStatus } from '../types/Form';
+import type { UF, FormData, FormPayload, LocationSnapshot, LocationStatus } from '../types/Form';
+import { UF_OPTIONS } from '../services/brLocations';
 
 const STORAGE_KEY = '@forms_queue';
 
-const ESTADO_VALUES: EstadoCivil[] = ['', 'Solteiro', 'Casado', 'Divorciado'];
+const UF_VALUES: UF[] = ['', ...(UF_OPTIONS as readonly UF[])];
 
 interface LegacyFormData {
   id?: unknown;
@@ -21,22 +22,10 @@ function sanitizeString(value: unknown): string {
   return typeof value === 'string' ? value.trim() : '';
 }
 
-function sanitizeBoolean(value: unknown): boolean {
-  return typeof value === 'boolean' ? value : false;
-}
-
-function sanitizeTags(value: unknown): string[] {
-  if (!Array.isArray(value)) return [];
-  return value
-    .filter((item): item is string => typeof item === 'string')
-    .map((item) => item.trim())
-    .filter((item) => item.length > 0);
-}
-
-function sanitizeEstado(value: unknown): EstadoCivil {
+function sanitizeUF(value: unknown): UF {
   if (typeof value !== 'string') return '';
-  const trimmed = value.trim();
-  return ESTADO_VALUES.includes(trimmed as EstadoCivil) ? (trimmed as EstadoCivil) : '';
+  const trimmed = value.trim().toUpperCase();
+  return UF_VALUES.includes(trimmed as UF) ? (trimmed as UF) : '';
 }
 
 function sanitizeStatus(value: unknown): LocationStatus {
@@ -50,9 +39,6 @@ function sanitizeNumberOrNull(value: unknown): number | null {
 
 function createEmptyPayload(): FormPayload {
   return {
-    lideranca: '',
-    isLideranca: false,
-    tipo: '',
     nomeCompleto: '',
     apelido: '',
     estado: '',
@@ -64,7 +50,6 @@ function createEmptyPayload(): FormPayload {
     email: '',
     dataNascimento: '',
     sexo: '',
-    localidade: '',
     logradouro: '',
     numero: '',
     complemento: '',
@@ -73,11 +58,8 @@ function createEmptyPayload(): FormPayload {
     tituloEleitor: '',
     cpf: '',
     rg: '',
-    validacao: '',
     facebook: '',
     instagram: '',
-    categoria: '',
-    tags: [],
     observacoes: '',
   };
 }
@@ -87,12 +69,9 @@ function sanitizePayload(value: unknown): FormPayload {
   if (!isRecord(value)) return payload;
 
   return {
-    lideranca: sanitizeString(value.lideranca),
-    isLideranca: sanitizeBoolean(value.isLideranca),
-    tipo: sanitizeString(value.tipo),
     nomeCompleto: sanitizeString(value.nomeCompleto),
     apelido: sanitizeString(value.apelido),
-    estado: sanitizeEstado(value.estado),
+    estado: sanitizeUF(value.estado),
     cidade: sanitizeString(value.cidade),
     zona: sanitizeString(value.zona),
     secao: sanitizeString(value.secao),
@@ -101,7 +80,6 @@ function sanitizePayload(value: unknown): FormPayload {
     email: sanitizeString(value.email),
     dataNascimento: sanitizeString(value.dataNascimento),
     sexo: sanitizeString(value.sexo),
-    localidade: sanitizeString(value.localidade),
     logradouro: sanitizeString(value.logradouro),
     numero: sanitizeString(value.numero),
     complemento: sanitizeString(value.complemento),
@@ -110,11 +88,8 @@ function sanitizePayload(value: unknown): FormPayload {
     tituloEleitor: sanitizeString(value.tituloEleitor),
     cpf: sanitizeString(value.cpf),
     rg: sanitizeString(value.rg),
-    validacao: sanitizeString(value.validacao),
     facebook: sanitizeString(value.facebook),
     instagram: sanitizeString(value.instagram),
-    categoria: sanitizeString(value.categoria),
-    tags: sanitizeTags(value.tags),
     observacoes: sanitizeString(value.observacoes),
   };
 }

@@ -8,15 +8,40 @@ export interface LocationSnapshot {
   accuracy: number | null;
 }
 
-export type EstadoCivil = '' | 'Solteiro' | 'Casado' | 'Divorciado';
+export type UF =
+  | ''
+  | 'AC'
+  | 'AL'
+  | 'AP'
+  | 'AM'
+  | 'BA'
+  | 'CE'
+  | 'DF'
+  | 'ES'
+  | 'GO'
+  | 'MA'
+  | 'MT'
+  | 'MS'
+  | 'MG'
+  | 'PA'
+  | 'PB'
+  | 'PR'
+  | 'PE'
+  | 'PI'
+  | 'RJ'
+  | 'RN'
+  | 'RS'
+  | 'RO'
+  | 'RR'
+  | 'SC'
+  | 'SP'
+  | 'SE'
+  | 'TO';
 
 export interface FormPayload {
-  lideranca: string;
-  isLideranca: boolean;
-  tipo: string;
   nomeCompleto: string;
   apelido: string;
-  estado: EstadoCivil;
+  estado: UF;
   cidade: string;
   zona: string;
   secao: string;
@@ -25,7 +50,6 @@ export interface FormPayload {
   email: string;
   dataNascimento: string;
   sexo: string;
-  localidade: string;
   logradouro: string;
   numero: string;
   complemento: string;
@@ -34,11 +58,8 @@ export interface FormPayload {
   tituloEleitor: string;
   cpf: string;
   rg: string;
-  validacao: string;
   facebook: string;
   instagram: string;
-  categoria: string;
-  tags: string[];
   observacoes: string;
 }
 

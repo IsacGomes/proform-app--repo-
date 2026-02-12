@@ -1,14 +1,20 @@
-import type { EstadoCivil, FormPayload } from '../types/Form';
+import type { UF, FormPayload } from '../types/Form';
+import { UF_OPTIONS } from '../services/brLocations';
 
-export type FieldType = 'text' | 'email' | 'phone' | 'select' | 'checkbox' | 'textarea';
+export type FieldType = 'text' | 'email' | 'phone' | 'select' | 'textarea';
+export type FormSection = 'Pessoa' | 'Localização' | 'Contato' | 'Observações';
+
+export const FORM_SECTIONS: readonly FormSection[] = [
+  'Pessoa',
+  'Localização',
+  'Contato',
+  'Observações',
+];
 
 export interface FormValues {
-  lideranca: string;
-  isLideranca: boolean;
-  tipo: string;
   nomeCompleto: string;
   apelido: string;
-  estado: EstadoCivil;
+  estado: UF;
   cidade: string;
   zona: string;
   secao: string;
@@ -17,7 +23,6 @@ export interface FormValues {
   email: string;
   dataNascimento: string;
   sexo: string;
-  localidade: string;
   logradouro: string;
   numero: string;
   complemento: string;
@@ -26,71 +31,143 @@ export interface FormValues {
   tituloEleitor: string;
   cpf: string;
   rg: string;
-  validacao: string;
   facebook: string;
   instagram: string;
-  categoria: string;
-  tags: string;
   observacoes: string;
 }
 
 export interface FormFieldDefinition {
   key: keyof FormValues;
   label: string;
+  section: FormSection;
   type: FieldType;
   placeholder?: string;
   required?: boolean;
   options?: string[];
+  disabled?: boolean;
 }
 
-const ESTADO_OPTIONS = ['Solteiro', 'Casado', 'Divorciado'] as const;
-
-const FORM_TEMPLATE: FormFieldDefinition[] = [
-  { key: 'lideranca', label: 'Lideranca', type: 'text', placeholder: 'Informe a lideranca' },
-  { key: 'isLideranca', label: 'E lideranca?', type: 'checkbox' },
-  { key: 'tipo', label: 'Tipo', type: 'text', placeholder: 'Tipo de cadastro' },
-  { key: 'nomeCompleto', label: 'Nome Completo', type: 'text', required: true, placeholder: 'Nome completo' },
-  { key: 'apelido', label: 'Apelido', type: 'text', placeholder: 'Apelido' },
-  { key: 'estado', label: 'Estado', type: 'select', options: [...ESTADO_OPTIONS] },
-  { key: 'cidade', label: 'Cidade', type: 'text', placeholder: 'Cidade' },
-  { key: 'zona', label: 'Zona', type: 'text', placeholder: 'Zona' },
-  { key: 'secao', label: 'Secao', type: 'text', placeholder: 'Secao' },
-  { key: 'nivelApoio', label: 'Nivel de Apoio', type: 'text', placeholder: 'Nivel de apoio' },
-  { key: 'telefone', label: 'Telefone', type: 'phone', required: true, placeholder: '(00) 00000-0000' },
-  { key: 'email', label: 'E-mail', type: 'email', placeholder: 'email@dominio.com' },
-  {
-    key: 'dataNascimento',
-    label: 'Data de Nascimento',
-    type: 'text',
-    placeholder: 'DD/MM/AAAA ou AAAA-MM-DD',
-  },
-  { key: 'sexo', label: 'Sexo', type: 'text', placeholder: 'Sexo' },
-  { key: 'localidade', label: 'Localidade', type: 'text', placeholder: 'Localidade' },
-  { key: 'logradouro', label: 'Logradouro', type: 'text', placeholder: 'Logradouro' },
-  { key: 'numero', label: 'Numero', type: 'text', placeholder: 'Numero' },
-  { key: 'complemento', label: 'Complemento', type: 'text', placeholder: 'Complemento' },
-  { key: 'bairro', label: 'Bairro', type: 'text', placeholder: 'Bairro' },
-  { key: 'cep', label: 'CEP', type: 'text', placeholder: '00000-000' },
-  { key: 'tituloEleitor', label: 'Titulo de Eleitor', type: 'text', placeholder: 'Titulo de eleitor' },
-  { key: 'cpf', label: 'CPF', type: 'text', required: true, placeholder: '000.000.000-00' },
-  { key: 'rg', label: 'RG', type: 'text', placeholder: 'RG' },
-  { key: 'validacao', label: 'Validacao', type: 'text', placeholder: 'Status de validacao' },
-  { key: 'facebook', label: 'Facebook', type: 'text', placeholder: '@usuario' },
-  { key: 'instagram', label: 'Instagram', type: 'text', placeholder: '@usuario' },
-  { key: 'categoria', label: 'Categoria', type: 'text', placeholder: 'Categoria' },
-  { key: 'tags', label: 'Tags', type: 'text', placeholder: 'tag1, tag2, tag3' },
-  { key: 'observacoes', label: 'Observacoes', type: 'textarea', placeholder: 'Observacoes' },
-];
-
-export function getFormTemplate(): FormFieldDefinition[] {
-  return FORM_TEMPLATE;
+export function getFormTemplate(cityOptions: string[]): FormFieldDefinition[] {
+  return [
+    {
+      key: 'nomeCompleto',
+      label: 'Nome Completo',
+      section: 'Pessoa',
+      type: 'text',
+      required: true,
+      placeholder: 'Nome completo',
+    },
+    { key: 'apelido', label: 'Apelido', section: 'Pessoa', type: 'text', placeholder: 'Apelido' },
+    {
+      key: 'dataNascimento',
+      label: 'Data de Nascimento',
+      section: 'Pessoa',
+      type: 'text',
+      placeholder: 'DD/MM/AAAA ou AAAA-MM-DD',
+    },
+    {
+      key: 'sexo',
+      label: 'Sexo',
+      section: 'Pessoa',
+      type: 'select',
+      options: ['Masculino', 'Feminino', 'Prefiro nao dizer'],
+      placeholder: 'Selecione uma opcao',
+    },
+    {
+      key: 'nivelApoio',
+      label: 'Nivel de Apoio',
+      section: 'Pessoa',
+      type: 'text',
+      placeholder: 'Nivel de apoio',
+    },
+    {
+      key: 'tituloEleitor',
+      label: 'Titulo de Eleitor',
+      section: 'Pessoa',
+      type: 'text',
+      placeholder: 'Titulo de eleitor',
+    },
+    {
+      key: 'cpf',
+      label: 'CPF',
+      section: 'Pessoa',
+      type: 'text',
+      required: true,
+      placeholder: '000.000.000-00',
+    },
+    { key: 'rg', label: 'RG', section: 'Pessoa', type: 'text', placeholder: 'RG' },
+    {
+      key: 'estado',
+      label: 'UF',
+      section: 'Localização',
+      type: 'select',
+      required: true,
+      options: [...UF_OPTIONS],
+    },
+    {
+      key: 'cidade',
+      label: 'Cidade',
+      section: 'Localização',
+      type: 'select',
+      required: true,
+      options: cityOptions,
+      disabled: cityOptions.length === 0,
+      placeholder: cityOptions.length === 0 ? 'Selecione a UF primeiro' : 'Selecione uma cidade',
+    },
+    { key: 'zona', label: 'Zona', section: 'Localização', type: 'text', placeholder: 'Zona' },
+    { key: 'secao', label: 'Secao', section: 'Localização', type: 'text', placeholder: 'Secao' },
+    {
+      key: 'logradouro',
+      label: 'Logradouro',
+      section: 'Localização',
+      type: 'text',
+      placeholder: 'Logradouro',
+    },
+    { key: 'numero', label: 'Numero', section: 'Localização', type: 'text', placeholder: 'Numero' },
+    {
+      key: 'complemento',
+      label: 'Complemento',
+      section: 'Localização',
+      type: 'text',
+      placeholder: 'Complemento',
+    },
+    { key: 'bairro', label: 'Bairro', section: 'Localização', type: 'text', placeholder: 'Bairro' },
+    { key: 'cep', label: 'CEP', section: 'Localização', type: 'text', placeholder: '00000-000' },
+    {
+      key: 'telefone',
+      label: 'Telefone',
+      section: 'Contato',
+      type: 'phone',
+      required: true,
+      placeholder: '(00) 00000-0000',
+    },
+    { key: 'email', label: 'E-mail', section: 'Contato', type: 'email', placeholder: 'email@dominio.com' },
+    {
+      key: 'facebook',
+      label: 'Facebook',
+      section: 'Contato',
+      type: 'text',
+      placeholder: '@usuario',
+    },
+    {
+      key: 'instagram',
+      label: 'Instagram',
+      section: 'Contato',
+      type: 'text',
+      placeholder: '@usuario',
+    },
+    {
+      key: 'observacoes',
+      label: 'Observacoes',
+      section: 'Observações',
+      type: 'textarea',
+      placeholder: 'Observacoes',
+    },
+  ];
 }
 
 export function createInitialFormValues(): FormValues {
   return {
-    lideranca: '',
-    isLideranca: false,
-    tipo: '',
     nomeCompleto: '',
     apelido: '',
     estado: '',
@@ -102,7 +179,6 @@ export function createInitialFormValues(): FormValues {
     email: '',
     dataNascimento: '',
     sexo: '',
-    localidade: '',
     logradouro: '',
     numero: '',
     complemento: '',
@@ -111,11 +187,8 @@ export function createInitialFormValues(): FormValues {
     tituloEleitor: '',
     cpf: '',
     rg: '',
-    validacao: '',
     facebook: '',
     instagram: '',
-    categoria: '',
-    tags: '',
     observacoes: '',
   };
 }
@@ -123,6 +196,14 @@ export function createInitialFormValues(): FormValues {
 export function validateFormValues(values: FormValues): { valid: boolean; message?: string } {
   if (!values.nomeCompleto.trim()) {
     return { valid: false, message: 'Nome Completo e obrigatorio.' };
+  }
+
+  if (!values.estado.trim()) {
+    return { valid: false, message: 'UF e obrigatoria.' };
+  }
+
+  if (!values.cidade.trim()) {
+    return { valid: false, message: 'Cidade e obrigatoria.' };
   }
 
   if (!values.telefone.trim()) {
@@ -144,8 +225,8 @@ export function validateFormValues(values: FormValues): { valid: boolean; messag
   return { valid: true };
 }
 
-function normalizeEstado(value: EstadoCivil): EstadoCivil {
-  return ESTADO_OPTIONS.includes(value as (typeof ESTADO_OPTIONS)[number]) ? value : '';
+function normalizeUF(value: UF): UF {
+  return UF_OPTIONS.includes(value as (typeof UF_OPTIONS)[number]) ? value : '';
 }
 
 function normalizeText(value: string): string {
@@ -154,12 +235,9 @@ function normalizeText(value: string): string {
 
 export function normalizeFormValues(values: FormValues): FormPayload {
   return {
-    lideranca: normalizeText(values.lideranca),
-    isLideranca: values.isLideranca,
-    tipo: normalizeText(values.tipo),
     nomeCompleto: normalizeText(values.nomeCompleto),
     apelido: normalizeText(values.apelido),
-    estado: normalizeEstado(values.estado),
+    estado: normalizeUF(values.estado),
     cidade: normalizeText(values.cidade),
     zona: normalizeText(values.zona),
     secao: normalizeText(values.secao),
@@ -168,7 +246,6 @@ export function normalizeFormValues(values: FormValues): FormPayload {
     email: normalizeText(values.email),
     dataNascimento: normalizeText(values.dataNascimento),
     sexo: normalizeText(values.sexo),
-    localidade: normalizeText(values.localidade),
     logradouro: normalizeText(values.logradouro),
     numero: normalizeText(values.numero),
     complemento: normalizeText(values.complemento),
@@ -177,14 +254,8 @@ export function normalizeFormValues(values: FormValues): FormPayload {
     tituloEleitor: normalizeText(values.tituloEleitor),
     cpf: normalizeText(values.cpf),
     rg: normalizeText(values.rg),
-    validacao: normalizeText(values.validacao),
     facebook: normalizeText(values.facebook),
     instagram: normalizeText(values.instagram),
-    categoria: normalizeText(values.categoria),
-    tags: values.tags
-      .split(',')
-      .map((tag) => tag.trim())
-      .filter((tag) => tag.length > 0),
     observacoes: normalizeText(values.observacoes),
   };
 }
